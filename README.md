@@ -13,11 +13,15 @@ This repository is structured as followed:
        - ...
 2. Two folders are pre-made, `model A` and `model B`. The model A folder is for Anna and Jess to do all their work in, and the `model B` is for Bara, Gaia, and Stefan, as per the task division. Further information about the exact assignment can be found below or on Canvas.
 3. Firstly, feel free ot ask, but here is a refresher on GitHub:
-   1. `git clone https://github.com/Gahtao/DL-Project.git` to copy this repository to your PC.
+   - `git clone https://github.com/Gahtao/DL-Project.git` to copy this repository to your PC.
       - Don't forget to move into the newly created folder before continuing.
-   2. `git pull` to update your local files. Use this command _always_ **before** you start working on the project.
-   3. `git push` to update the online files. Use this command _always_ **after** you are done working on the project.
-   4. Sometimes these commands may throw a fit because multiple people have worked on the same file, at the same time, or someone didn't use the above commands structurally as described. In that case, send a screenshot of whatever message pops up in the group chat (or resolve it yourself if you have the know-how).
+   - Use this command _always_ **before** you start working on the project.
+     1. `git pull` to update your local files.
+   - Use the following commands _always_ **after** you are done working on the project.
+     1. `git add .` to slate all changed files to the next commit. 
+     2. `git commit -m "[INSERT MESSAGE]"` to create a commit with a relevant message. 
+     3. `git push` to update the online files on GitHub. 
+   - Sometimes these commands may throw a fit because multiple people have worked on the same file, at the same time, or someone didn't use the above commands structurally as described. In that case, send a screenshot of whatever message pops up in the group chat (or resolve it yourself if you have the know-how).
 
 ## Set-Up
 I'll probably automate a conda environment for reproducibility, but not right now.
