@@ -244,5 +244,5 @@ fabric.properties
 
 
 
-# Multimodal-Arcelli project specific
-# data/
+# DL project specific
+data/
