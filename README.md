@@ -22,6 +22,7 @@ This repository is structured as followed:
      2. `git commit -m "[INSERT MESSAGE]"` to create a commit with a relevant message. 
      3. `git push` to update the online files on GitHub. 
    - Sometimes these commands may throw a fit because multiple people have worked on the same file, at the same time, or someone didn't use the above commands structurally as described. In that case, send a screenshot of whatever message pops up in the group chat (or resolve it yourself if you have the know-how).
+4. (optional) I've created a conda `environment.yml` for use of use. If you use conda, install it using `conda env create -f environment.yml` to install it.
 
 ## Set-Up
 I'll probably automate a conda environment for reproducibility, but not right now.
