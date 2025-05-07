@@ -246,3 +246,4 @@ fabric.properties
 
 # DL project specific
 data/
+model B/preprocessed
