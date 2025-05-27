@@ -2,7 +2,6 @@
 
 import pandas as pd
 import torchaudio
-import torchaudio.transforms as transforms
 import torch
 from torch.utils.data import DataLoader, Subset, TensorDataset
 import os
@@ -125,3 +124,9 @@ def get_data_loaders(batch_size=128):
     val_loader = DataLoader(dataset=val_dataset, batch_size=batch_size)
 
     return train_loader, val_loader, class_names
+
+def genLabelsCSV(file_path):
+    df_labels = pd.DataFrame(columns=["file_name", "label"])
+    df_labels.file_name = os.listdir(file_path)
+    df_labels.label = [name[0] for name in df_labels.file_name]
+    df_labels.to_csv(f'{file_path}/labels.csv', index=False)
