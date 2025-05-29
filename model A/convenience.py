@@ -13,6 +13,26 @@ output:
     df_train_val: Pandas dataframe with "file_name", "stratify", "accent", "gender", "audio"
     sample_rates: List of sample rates of audio files
 '''
+
+def load_train(path = "../data/Train"):
+    # Import train data
+    df_train = pd.DataFrame(columns=["file_name", "stratify", "accent", "gender", "audio"])
+    df_train.file_name = os.listdir(path)
+    df_train.stratify = [name.split("_")[0] for name in df_train.file_name]
+    df_train.accent = [file_name[0] for file_name in df_train.file_name]
+    df_train.gender = [file_name[1] for file_name in df_train.file_name]
+    loaded_audio = []
+    # display(df_train)
+    sample_rates = set()
+    for file_name in df_train.file_name:
+        tensor, sr = torchaudio.load(f"{path}/{file_name}")
+        loaded_audio.append(tensor[0])
+        sample_rates.add(sr)
+
+    df_train.audio = loaded_audio
+    df_train["length"] = [len(df_train.audio[i])/16000 for i  in range(0, len(df_train))]
+    return df_train, sample_rates
+
 def load_train_val(path = "../data/Train"):
     # Import train data
     df_train_val = pd.DataFrame(columns=["file_name", "stratify", "accent", "gender", "audio", "sample_rate"])
