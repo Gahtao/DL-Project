@@ -26,6 +26,23 @@ def load_train(path = "../data/Train"):
     df_train["length"] = [len(df_train.audio[i])/16000 for i  in range(0, len(df_train))]
     return df_train, sample_rates
 
+def load_test(path = "../data/Test set"):
+    # Import train data
+    df_test = pd.DataFrame(columns=["id","file_name", "audio"])
+    df_test.file_name = os.listdir(path)
+    df_test.id = [name.split(".")[0] for name in df_test.file_name]
+    loaded_audio = []
+    # display(df_train)
+    sample_rates = set()
+    for file_name in df_test.file_name:
+        tensor, sr = torchaudio.load(f"{path}/{file_name}")
+        loaded_audio.append(tensor[0])
+        sample_rates.add(sr)
+
+    df_test.audio = loaded_audio
+    df_test["length"] = [len(df_test.audio[i])/16000 for i  in range(0, len(df_test))]
+    return df_test, sample_rates
+
 def loop_audio_df(df, target_duration, sr):
     looped_audios = []
     for _, row in df.iterrows():
