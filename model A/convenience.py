@@ -1,5 +1,3 @@
-# This file is used to import important and large functions easily
-
 import pandas as pd
 import torchaudio
 import torch
@@ -8,25 +6,41 @@ import os
 import math
 import numpy as np
 
-def load_train(path = "../data/Train"):
+'''
+input:
+    path: Path to original train_val data
+output:
+    df_train_val: Pandas dataframe with "file_name", "stratify", "accent", "gender", "audio"
+    sample_rates: List of sample rates of audio files
+'''
+def load_train_val(path = "../data/Train"):
     # Import train data
-    df_train = pd.DataFrame(columns=["file_name", "stratify", "accent", "gender", "audio", "sample_rate"])
-    df_train.file_name = os.listdir(path)
-    df_train.stratify = [name.split("_")[0] for name in df_train.file_name]
-    df_train.accent = [file_name[0] for file_name in df_train.file_name]
-    df_train.gender = [file_name[1] for file_name in df_train.file_name]
+    df_train_val = pd.DataFrame(columns=["file_name", "stratify", "accent", "gender", "audio", "sample_rate"])
+    df_train_val.file_name = os.listdir(path)
+    df_train_val.stratify = [name.split("_")[0] for name in df_train_val.file_name]
+    df_train_val.accent = [file_name[0] for file_name in df_train_val.file_name]
+    df_train_val.gender = [file_name[1] for file_name in df_train_val.file_name]
     loaded_audio = []
     # display(df_train)
     sample_rates = set()
-    for file_name in df_train.file_name:
+    for file_name in df_train_val.file_name:
         tensor, sr = torchaudio.load(f"{path}/{file_name}")
         loaded_audio.append(tensor[0])
         sample_rates.add(sr)
 
-    df_train.audio = loaded_audio
-    df_train["length"] = [len(df_train.audio[i])/16000 for i  in range(0, len(df_train))]
-    return df_train, sample_rates
+    df_train_val.audio = loaded_audio
+    df_train_val["length"] = [len(df_train_val.audio[i])/16000 for i  in range(0, len(df_train_val))]
+    return df_train_val, sample_rates
 
+'''
+input:
+    df: Pandas dataframe with "file_name", "stratify", "accent", "gender", "audio"
+    target_duration: The length of all resulting audio
+    sr: Desired sampling rate
+output:
+    df: df with additional "looped audio" section
+    sr: The same sampling rate as input
+'''
 def loop_audio_df(df, target_duration, sr):
     looped_audios = []
     for _, row in df.iterrows():
@@ -54,6 +68,14 @@ def loop_audio_df(df, target_duration, sr):
     df["looped_length"] = looped_lengths
     return df, sr
 
+'''
+input:
+    path: Path to where the preprocessed audio files are
+output:
+    df_train: Pandas dataframe with "file_name", "stratify", "accent", "gender", "audio"
+    loaded_audio: A list of tensors, each an audio file
+    sample_rates: A list of the sample rates of each file (should all be the same?)
+'''
 def load_train_post_processing(path = "./preprocessed/train/"):
     df_train = pd.DataFrame(columns=["file_name", "stratify", "accent", "gender", "audio"])
     df_train.file_name = os.listdir(path)
@@ -64,16 +86,23 @@ def load_train_post_processing(path = "./preprocessed/train/"):
     # display(df_train)
     sample_rates = set()
     for file_name in df_train.file_name:
-        tensor = torch.tensor(np.load(f"{path}/{file_name}"))
+        tnsor = torch.tensor(np.load(f"{path}/{file_name}"))
         sr = 16000
-        loaded_audio.append(tensor[0])
+        loaded_audio.append(tnsor[0])
         sample_rates.add(sr)
 
     df_train.audio = loaded_audio
     df_train["length"] = [len(loaded_audio[i]) / 16000 for i in range(0, len(df_train))]
     return df_train, loaded_audio, sample_rates
 
-
+'''
+input:
+    batch_size: The batch_size
+output:
+    train_loader: Torch audio loader for the training data
+    val_loader: Torch audio loader for the validation data
+    class_names: List of class_names (accents)
+'''
 def get_data_loaders(batch_size=128):
     # Load the full dataset
     df, loaded_audio, _ = load_train_post_processing()
@@ -125,8 +154,47 @@ def get_data_loaders(batch_size=128):
 
     return train_loader, val_loader, class_names
 
+'''
+input:
+    file_path: A path to the folder with audio files
+output:
+    None (directly generated a .csv file)
+'''
 def genLabelsCSV(file_path):
     df_labels = pd.DataFrame(columns=["file_name", "label"])
     df_labels.file_name = os.listdir(file_path)
     df_labels.label = [name[0] for name in df_labels.file_name]
     df_labels.to_csv(f'{file_path}/labels.csv', index=False)
+
+
+'''
+input:
+    tnsr: a single tensor
+output:
+    n_tensr: a standardized tensor
+'''
+def standardize(tnsr):
+    n_tensr = torch.zeros_like(tnsr)
+    mean = tnsr.mean()
+    std = tnsr.std()
+    for i, n in enumerate(tnsr):
+        n_tensr[i] = (n - mean) / std
+    return n_tensr
+
+'''
+input:
+    tnsrs: a list of tensors
+output:
+    n_tnsrs: a list of tensors of the same length (appended with zeros where necessary)
+    max_length: the new length of all tensors
+'''
+def zero_fills(tnsrs):
+    max_length = max([len(x) for x in tnsrs])
+    n_tnsrs = []
+    for tnsr in tnsrs:
+        n_tnsr = tnsr
+        for i in range(max_length- len(tnsr)):
+            n_tnsr = torch.cat((n_tnsr, torch.tensor([0])), 0)
+        n_tnsrs.append(n_tnsr)
+    print(f"Filled tensors! New length: {max_length}")
+    return n_tnsrs, max_length

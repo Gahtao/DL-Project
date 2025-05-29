@@ -3,7 +3,19 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import matplotlib.pyplot as plt
-from convenience import get_data_loaders
+import os
+import torch
+import pandas as pd
+import numpy as np
+from torch.utils.data import Dataset
+from torch.nn.functional import one_hot
+from torch.utils.data import DataLoader
+# Matplotlib plots using https://stackoverflow.com/questions/37360568/python-organisation-of-3-subplots-with-matplotlib
+from torcheval.metrics.functional import multiclass_f1_score
+import matplotlib.gridspec as gridspec
+from torcheval.metrics.aggregation.auc import AUC
+
+
 #%%
 # Set random seed for reproducibility
 torch.manual_seed(42)
@@ -11,15 +23,8 @@ batch_size = 32
 
 # Check if GPU is available and set device accordingly
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print(f"Device set to: {device}")
+print(f"Device set to: {device}", flush=True)
 #%%
-import os
-import torch
-import pandas as pd
-import numpy as np
-from torch.utils.data import Dataset
-from torch.nn.functional import one_hot
-
 
 class CustomImageDataset(Dataset):
     def __init__(self, annotations_file, img_dir, transform=None, target_transform=None):
@@ -45,7 +50,6 @@ class CustomImageDataset(Dataset):
 val_set = CustomImageDataset("./preprocessed/val/labels.csv", "preprocessed/val/specs")
 train_set = CustomImageDataset("preprocessed/train/labels.csv", "preprocessed/train/specs")
 #%%
-from torch.utils.data import DataLoader
 train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
 val_loader = DataLoader(val_set, batch_size=batch_size, shuffle=True)
 #%%
@@ -53,39 +57,20 @@ val_loader = DataLoader(val_set, batch_size=batch_size, shuffle=True)
 class SimpleCNN(nn.Module):
     def __init__(self):
         super(SimpleCNN, self).__init__()
-        self.dropout_prob = 0.2
-        
+
         # First Convolutional Layer
-        self.conv1 = nn.Conv2d(in_channels=1, out_channels=16, kernel_size=3, padding=1)
+        self.conv1 = nn.Conv1d(in_channels=1, out_channels=16, kernel_size=3, padding=1)
         self.relu = nn.ReLU()
-        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.pool = nn.MaxPool1d(kernel_size=2, stride=2)
         
         # Second Convolutional Layer
-        self.conv2 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, padding=1)
-        
-        # Third Convolutional Layer
-        self.conv3 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, padding=1)
-        
-        # Fourth Convolutional Layer
-        self.conv4 = nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, padding=1)
+        self.conv2 = nn.Conv1d(in_channels=16, out_channels=32, kernel_size=3, padding=1)
 
-        # Fifth Convolutional Layer
-        self.conv5 = nn.Conv2d(in_channels=128, out_channels=256, kernel_size=3, padding=1)
-
-        # Dropout Layers
-        self.dropout1 = nn.Dropout(self.dropout_prob)
-        self.dropout2 = nn.Dropout(self.dropout_prob)
-        self.dropout3 = nn.Dropout(self.dropout_prob)
-        self.dropout4 = nn.Dropout(self.dropout_prob)
-        # self.dropout5 = nn.Dropout(self.dropout_prob)
 
         # Fully Connected Layers
-        fc1_in_features = 256 * 8 * 25
-        self.fc1 = nn.Linear(in_features=fc1_in_features, out_features=256)
-        self.fc2 = nn.Linear(in_features=256, out_features=128)
-        self.fc3 = nn.Linear(in_features=128, out_features=64)
-        self.fc4 = nn.Linear(in_features=64, out_features=32)
-        self.fc5 = nn.Linear(in_features=32, out_features=5)
+        fc1_in_features = 32 * 8 * 25 # need length of input audio before deciding this
+        self.fc1 = nn.Linear(in_features=fc1_in_features, out_features=32)
+        self.fc2 = nn.Linear(in_features=32, out_features=5)
 
         # Output activitation function
         self.softmax = nn.Softmax(dim=1)
@@ -101,41 +86,15 @@ class SimpleCNN(nn.Module):
         x = self.relu(x)
         x = self.pool(x)
         
-        # Third Convolutional Block
-        x = self.conv3(x)
-        x = self.relu(x)
-        x = self.pool(x)
-
-         # Fourth Convolutional Block
-        x = self.conv4(x)
-        x = self.relu(x)
-        x = self.pool(x)
-
-        # Fifth Convolutional Block
-        x = self.conv5(x)
-        x = self.relu(x)
-        
         # Flatten for Fully Connected Layers
         x = x.view(-1, self.fc1.in_features)
         
         # Fully Connected Layers
         x = self.fc1(x)
         x = self.relu(x)
-        x = self.dropout1(x)
 
         x = self.fc2(x)
         x = self.relu(x)
-        x = self.dropout2(x)
-
-        x = self.fc3(x)
-        x = self.relu(x)
-        x = self.dropout3(x)
-
-        x = self.fc4(x)
-        x = self.relu(x)
-        x = self.dropout4(x)
-
-        x = self.fc5(x)
 
         # Output layer
         x = self.softmax(x)
@@ -143,11 +102,6 @@ class SimpleCNN(nn.Module):
         return x
 #%%
 # Training loop
-
-# Matplotlib plots using https://stackoverflow.com/questions/37360568/python-organisation-of-3-subplots-with-matplotlib
-from torcheval.metrics.aggregation.auc import AUC
-from torcheval.metrics.functional import multiclass_f1_score
-import matplotlib.gridspec as gridspec
 
 # Training Loop with Validation
 def train_model(model, train_loader, val_loader, epochs, criterion, optimizer):
@@ -311,7 +265,6 @@ def train_model(model, train_loader, val_loader, epochs, criterion, optimizer):
 
     return val_losses
 #%%
-from torcheval.metrics.aggregation.auc import AUC
 
 # Setting Hyperparameters and Training the Model
 
