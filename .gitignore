@@ -254,3 +254,4 @@ model B/preprocessed
 model B/augmented
 model B/preprocessed.zip
 model B/preprocessed_no_silence
+model B/my_test_model
