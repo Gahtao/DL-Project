@@ -161,11 +161,11 @@ input:
 output:
     None (directly generated a .csv file)
 '''
-def genLabelsCSV(file_path):
+def genLabelsCSV(file_path, output_path):
     df_labels = pd.DataFrame(columns=["file_name", "label"])
     df_labels.file_name = os.listdir(file_path)
     df_labels.label = [name[0] for name in df_labels.file_name]
-    df_labels.to_csv(f'{file_path}/labels.csv', index=False)
+    df_labels.to_csv(f'{output_path}/labels.csv', index=False)
 
 
 '''

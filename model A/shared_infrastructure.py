@@ -230,6 +230,8 @@ def train_model(model, train_loader, val_loader, epochs, criterion, optimizer, d
 
     # Plot Training and Validation Loss
     ax1 = plt.subplot(gs[0, 0])  # row 0, col 0
+    ax1.plot(train_losses, label='Training Loss', color='blue')
+    ax1.plot(val_losses, label='Validation Loss', color='orange')
     ax1.set_xlabel('Epoch')
     ax1.set_ylabel('Loss')
     ax1.set_title('Loss over Epochs')
@@ -237,6 +239,8 @@ def train_model(model, train_loader, val_loader, epochs, criterion, optimizer, d
 
     # Plot Training and Validation Accuracy
     ax2 = plt.subplot(gs[0, 1])  # row 0, col 1
+    ax2.plot(train_accuracies, label='Training Accuracy', color='blue')
+    ax2.plot(val_accuracies, label='Validation Accuracy', color='orange')
     ax2.set_xlabel('Epoch')
     ax2.set_ylabel('Accuracy (%)')
     ax2.set_title('Accuracy over Epochs')
@@ -244,6 +248,8 @@ def train_model(model, train_loader, val_loader, epochs, criterion, optimizer, d
 
     # # Plot Training and Validation AUC
     # ax3 = plt.subplot(gs[1, 0])  # row 1, col 0
+    # ax3.plot([train_AUC.cpu() for train_AUC in train_AUCs], label='Training AUC', color='blue')
+    # ax3.plot([val_AUC.cpu() for val_AUC in val_AUCs], label='Validation AUC', color='orange')
     # ax3.set_xlabel('Epoch')
     # ax3.set_ylabel('AUC')
     # ax3.set_title('AUC over Epochs')
@@ -251,6 +257,8 @@ def train_model(model, train_loader, val_loader, epochs, criterion, optimizer, d
 
     # Plot Training and Validation F1 Score
     ax4 = plt.subplot(gs[1, 1])  # row 1, col 1
+    ax4.plot(train_f1_scores, label='Training F1 Score', color='blue')
+    ax4.plot(val_f1_scores, label='Validation F1 Score', color='orange')
     ax4.set_xlabel('Epoch')
     ax4.set_ylabel('F1 Score')
     ax4.set_title('F1 Score over Epochs')
