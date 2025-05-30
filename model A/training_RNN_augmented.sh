@@ -18,5 +18,4 @@ conda activate DL-project
 cd "/home/u650228/DL-Project/model A" || exit
 
 # Code
-python 2-model-a.py --model 'CNN' --data_path './preprocessed/' --seed 42 --batch_size 16 --learning_rate 0.00001 --epochs 50
-python 2-model-a.py --model 'CNN' --data_path './preprocessed-augmented/' --seed 42 --batch_size 16 --learning_rate 0.00001 --epochs 50
+python 2-model-a.py --model 'RNN' --data_path './preprocessed-augmented/' --seed 42 --batch_size 16 --learning_rate 0.00001 --epochs 50

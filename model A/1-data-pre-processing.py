@@ -44,10 +44,10 @@ def preprocess(train_val_path, output_path):
         np.save(f'{val_output_path}/specs/{df_val.file_name[i][:-4]}.npy', df_val.looped_audio[i])
     print(f'Validation data saved! {datetime.datetime.now()}', flush=True)
 
-    c.genLabelsCSV(train_output_path)
+    c.genLabelsCSV(train_output_path + '/specs/', train_output_path)
     print(f'Generated labels.csv for training data! {datetime.datetime.now()}', flush=True)
 
-    c.genLabelsCSV(val_output_path)
+    c.genLabelsCSV(val_output_path + '/specs/', val_output_path)
     print(f'Generated labels.csv for validation data! {datetime.datetime.now()}', flush=True)
 
     print(f'{"-"*20}', flush=True)
