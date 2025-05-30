@@ -221,7 +221,7 @@ def train_model(model, train_loader, val_loader, epochs, criterion, optimizer, d
         # Print progress
         print(f'Epoch [{epoch + 1}/{epochs}], '
               f'Train - loss: {avg_train_loss:.4f}, acc: {train_accuracy * 100:.2f}%, AUC: {train_AUC.mean().item():.3f}, F1: {train_f1:.3f}; '
-              f'Validation - loss: {avg_val_loss:.4f}, acc: {val_accuracy * 100:.2f}%, AUC: {val_AUC.mean().item():.3f}, F1: {val_f1:.3f}')
+              f'Validation - loss: {avg_val_loss:.4f}, acc: {val_accuracy * 100:.2f}%, AUC: {val_AUC.mean().item():.3f}, F1: {val_f1:.3f}', flush=True)
 
 
     # Plotting the loss, accuracy, AUC, and F1 score over epochs
