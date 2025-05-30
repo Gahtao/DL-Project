@@ -18,3 +18,4 @@ conda activate DL-project
 cd "/home/u650228/DL-Project/model A" || exit
 
 # Code
+python test.py
