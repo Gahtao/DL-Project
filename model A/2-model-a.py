@@ -68,7 +68,7 @@ class SimpleCNN(nn.Module):
 
 
         # Fully Connected Layers
-        fc1_in_features = 32 * 8 * 25 # need length of input audio before deciding this
+        fc1_in_features = 1660224
         self.fc1 = nn.Linear(in_features=fc1_in_features, out_features=32)
         self.fc2 = nn.Linear(in_features=32, out_features=5)
 
@@ -115,7 +115,7 @@ def train_model(model, train_loader, val_loader, epochs, criterion, optimizer):
 
 
     metric = AUC()
-    
+
     # Loop over epochs
     for epoch in range(epochs):
         # Set the model to training mode
@@ -153,12 +153,12 @@ def train_model(model, train_loader, val_loader, epochs, criterion, optimizer):
                 # print(y_true_num)
                 outputs.data = torch.tensor([0.,0.,0.,0.,0.]).to(device)
                 outputs.data[predicted] = 1.
-                
+
                 total_train += label.size(0)
                 correct_train += (label == outputs.data).sum().item()//5
 
 
-                
+
         # Calculate average training loss
         avg_train_loss = total_train_loss / len(train_loader)
         train_losses.append(avg_train_loss)
@@ -172,8 +172,7 @@ def train_model(model, train_loader, val_loader, epochs, criterion, optimizer):
         train_AUCs.append(train_AUC)
 
         # Calculate training F1 score
-        train_f1 = multiclass_f1_score(y_pred,y_true_num,num_classes=5)
-
+        train_f1 = multiclass_f1_score(y_pred, y_true_num.long(), average='weighted', num_classes=5)
         # Validation loop
         model.eval()
         total_val_loss = 0.0
@@ -196,7 +195,7 @@ def train_model(model, train_loader, val_loader, epochs, criterion, optimizer):
                     val_outputs = model(image)
                     val_loss = criterion(val_outputs, label)
                     total_val_loss += val_loss.item()
- 
+
                     metric.update(val_outputs.data,label) # Update AUC
                     y_true_val = torch.cat((y_true,label),0)
                     y_pred_val = torch.cat((y_pred_val,val_outputs.data),0)
@@ -227,7 +226,7 @@ def train_model(model, train_loader, val_loader, epochs, criterion, optimizer):
         metric.reset()
 
         # Calculate validation F1 score
-        val_f1 = multiclass_f1_score(y_pred_val,y_true_num_val,num_classes=5)
+        val_f1 = multiclass_f1_score(y_pred_val, y_true_num_val.long(), average='weighted', num_classes=5)
         # Print progress every 10 epochs
         # if (epoch + 1) % 10 == 0:
         if True:

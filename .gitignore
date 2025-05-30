@@ -247,6 +247,9 @@ fabric.properties
 # DL project specific
 data/
 model A/preprocessed
+model A/augmented
+model A/preprocessed.zip
+model A/preprocessed_no_silence
 model B/preprocessed
 model B/augmented
 model B/preprocessed.zip
