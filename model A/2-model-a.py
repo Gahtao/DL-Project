@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch
 from torch.utils.data import DataLoader
-from torch.autograd import Variable
+import os
 from shared_infrastructure import CustomImageDataset, train_model
 import argparse
 
@@ -212,7 +212,15 @@ if __name__ == '__main__':
     optimizer = optim.Adam(model.parameters(), lr=0.00001)
 
     # Train the model using the defined training function
-    val_losses_simple = train_model(model, train_loader, val_loader, args['epochs'], criterion, optimizer, device, args['batch_size'])
+    val_losses_simple, model = train_model(model, train_loader, val_loader, args['epochs'], criterion, optimizer, device, args['batch_size'])
+
+    # Save the model
+    if not os.path.exists('./models/'):
+        os.makedirs('./models/')
+    now = datetime.datetime.now()
+    model.save(f'./models/{args['model']}-{now.hour}-{now.minute}-{now.second}{now.microsecond}')
+
+
     print(val_losses_simple, flush=True)
     print(f'END TRAINING - {datetime.datetime.now()}', flush=True)
     print('', flush=True)

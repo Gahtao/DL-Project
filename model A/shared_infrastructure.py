@@ -274,4 +274,4 @@ def train_model(model, train_loader, val_loader, epochs, criterion, optimizer, d
 
     model.load_state_dict(best_weights)
     print(f"Best F1-score: {best_f1}")
-    return val_losses
+    return val_losses, model
